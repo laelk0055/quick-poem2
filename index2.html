@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quick Poem</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fefefe;
+      color: #333;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    button {
+      background: #ffc5ec;
+      border: none;
+      padding: 0.8rem 1.2rem;
+      font-size: 1rem;
+      margin-top: 1rem;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+    #promptBox {
+      font-size: 1.2rem;
+      margin: 1rem auto;
+      padding: 1rem;
+      background: #d4f4f9;
+      border-radius: 8px;
+      max-width: 500px;
+    }
+
+    #timer {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    textarea {
+      width: 90%;
+      height: 150px;
+      margin-top: 1rem;
+      font-size: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    #stickyWall {
+      margin-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .sticky {
+      padding: 1rem;
+      width: 200px;
+      min-height: 120px;
+      color: #222;
+      font-size: 0.95rem;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    /* Pastel colors and fun shapes */
+    .shape1 { background: #ffefc2; border-radius: 8px; }
+    .shape2 { background: #c2f0fc; border-radius: 50%; }
+    .shape3 { background: #eac4ff; border-radius: 20px 50px; }
+    .shape4 { background: #caffbf; clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 20%); }
+    .shape5 { background: #ffd6a5; border-radius: 30% 70% 50% 50% / 50% 60% 40% 50%; }
+
+  </style>
+</head>
+<body>
+  <h1>Quick Poem</h1>
+  <p>Click the button to receive a prompt. You have 5 minutes to write and lock in your poem.</p>
+  <p><strong>Note:</strong> You can only generate another prompt after the five minutes is up <em>or</em> you lock in your poem.</p>
+
+  <div id="promptBox">Your prompt will appear here</div>
+  <div id="timer">00:00</div>
+  <button onclick="startPoem()" id="generateBtn">Generate Prompt</button>
+
+  <div>
+    <textarea id="poemBox" placeholder="Write your poem here..." disabled></textarea>
+    <br>
+    <button onclick="lockPoem()" id="lockBtn" disabled>Lock In Poem</button>
+  </div>
+
+  <h2>Your Poetry Wall</h2>
+  <div id="stickyWall"></div>
+
+  <script>
+    const prompts = [
+      "Describe the sky without using 'blue'",
+      "Write a poem from a puddle's point of view",
+      "Start with: 'When the clock hits zero...'",
+      "Describe a forgotten drawer",
+      "Use 3 smells in your first stanza",
+      "Begin with a lie",
+      "End with a question",
+    ];
+
+    let timer;
+    let seconds = 0;
+
+    function startPoem() {
+      const prompt = prompts[Math.floor(Math.random() * prompts.length)];
+      document.getElementById('promptBox').innerText = prompt;
+
+      document.getElementById('poemBox').disabled = false;
+      document.getElementById('poemBox').value = '';
+      document.getElementById('lockBtn').disabled = false;
+      document.getElementById('generateBtn').disabled = true;
+
+      seconds = 300;
+      updateTimer();
+      clearInterval(timer);
+      timer = setInterval(() => {
+        seconds--;
+        updateTimer();
+        if (seconds === 0) {
+          clearInterval(timer);
+          document.getElementById('generateBtn').disabled = false;
+        }
+      }, 1000);
+    }
+
+    function updateTimer() {
+      const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const sec = String(seconds % 60).padStart(2, '0');
+      document.getElementById('timer').innerText = `${min}:${sec}`;
+    }
+
+    function lockPoem() {
+      const poem = document.getElementById('poemBox').value.trim();
+      if (!poem) return;
+
+      const div = document.createElement('div');
+      const shapes = ['shape1', 'shape2', 'shape3', 'shape4', 'shape5'];
+      const style = shapes[Math.floor(Math.random() * shapes.length)];
+      div.className = `sticky ${style}`;
+      div.innerText = poem;
+      document.getElementById('stickyWall').appendChild(div);
+
+      // Disable editing
+      document.getElementById('poemBox').value = '';
+      document.getElementById('poemBox').disabled = true;
+      document.getElementById('lockBtn').disabled = true;
+      clearInterval(timer);
+      document.getElementById('generateBtn').disabled = false;
+      document.getElementById('timer').innerText = '00:00';
+    }
+  </script>
+</body>
+</html>
